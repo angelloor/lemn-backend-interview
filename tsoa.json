@@ -1,0 +1,15 @@
+{
+  "entryFile": "src/index.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/**/v1/**/*controller.ts"],
+  "spec": {
+    "outputDirectory": "src/tsoa/v1",
+    "specVersion": 3,
+    "basePath": "/api"
+  },
+  "routes": {
+    "routesDir": "src/tsoa/v1",
+    "basePath": "/api",
+    "authenticationModule": "src/middlewares/authentication.middleware.ts"
+  }
+}

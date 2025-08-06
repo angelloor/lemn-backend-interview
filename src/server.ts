@@ -1,46 +1,26 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
-import { PrismaClient } from "@prisma/client";
+import type { Application } from "express";
+import http, { Server } from "http";
 
-const app = express();
-const PORT = process.env.PORT || 8080;
-const prisma = new PrismaClient();
+// http or https depends on environment variables
+export const createServerFromEnv = (app: Application): Server => {
+  // logic to create an HTTPS server if needed
 
-// Middleware
-app.use(helmet());
-app.use(cors());
-app.use(morgan("combined"));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+  return http.createServer(app);
+};
 
-// Health check
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
-
-// Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log(" Shutting down gracefully...");
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-process.on("SIGTERM", async () => {
-  console.log("🛑 Shutting down gracefully...");
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-});
-
-export default app;
+// start the server http or https
+export const bootstrap = async (
+  server: Server,
+  port: number
+): Promise<void> => {
+  try {
+    server.listen(port);
+    server.on("error", (err) => {
+      console.error("Server error:", err);
+    });
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`📊 Health check: http://localhost:${port}/health`);
+  } catch (error) {
+    console.error("Failed to start server:", error);
+  }
+};
